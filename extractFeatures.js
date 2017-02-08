@@ -17,7 +17,7 @@ let base = new qm.Base({ mode: "createClean" });
 let newsStore = base.createStore(newsSchema);
 
 // import news
-let fn = config.pathToData + "Trump(27.12.2015-1.1.2016).json";
+let fn = config.pathToData + "Trump.json";
 let fin = qm.fs.openRead(fn);
 
 console.time("import");
@@ -46,12 +46,13 @@ let ftr = new qm.FeatureSpace(base,
     { type: "multinomial", source: "news", field: "concepts", 
         values: ["Gay", "Abortion"] }       // add new concepts if needed
 );
-ftr.addFeatureExtractor(
-    { type: "multinomial", source: "news", field: "date",datetime: true }
-);
+// ftr.addFeatureExtractor(
+//     { type: "multinomial", source: "news", field: "date",datetime: true }
+// );
 
 ftr.updateRecords(news);
 console.timeEnd("feature_extr");
+
 
 // Create store for Time Series 
 let tsSchema = {
@@ -67,11 +68,12 @@ let tsStore = base.createStore(tsSchema);
 
 console.log("tsStore created");
 
+
 // Initialise counts
+console.time("counts");
 var gaycount = 0;
 var abortioncount = 0;
-
-for (var i = 0; i < newsStore.allRecords.length; i++) {
+for (var i = 0; i < newsStore.length; i++) {
     var rec = newsStore[i];
     let recPrev = newsStore[0];
     if (i > 0)
@@ -83,19 +85,14 @@ for (var i = 0; i < newsStore.allRecords.length; i++) {
    
   
     // increase counts
-    if (rec.date.setHours(0, 0, 0) == recPrev.date.setHours(0, 0, 0)) { // condition that we are in the same day
-        
-        for (var j = 0; j < idxVec.length; j++) { // idxVec.length - 4
-            if( ftr.getFeature(idxVec[j]) == 'Gay')
-                gaycount += 1
-            if( ftr.getFeature(idxVec[j]) == 'Abortion')
-                abortioncount += 1;
-        }
-    }
-    else { // date changed so we push the value into tsStore
-
+    let date = rec.date;
+    date = date.setHours(0,0,0);
+    let prevDate = recPrev.date;
+    prevDate = prevDate.setHours(0,0,0);
+    if (date != prevDate) { // date changed so we push the value into tsStore
+        let weblogdate = recPrev.date.toISOString().replace(/\..+/, '');
         tsStore.push({
-            Time: new Date(recPrev.date).toISOString(),
+            Time: weblogdate, 
             gayCount: gaycount,
             abortionCount: abortioncount
         });
@@ -113,19 +110,18 @@ for (var i = 0; i < newsStore.allRecords.length; i++) {
             "Abortion: ",
             newRec.abortionCount
         );
-
-        // Check the first element of new date
-        for (var j = 0; j < idxVec.length; j++) { // idxVec.length - 4
-            if (ftr.getFeature(idxVec[j]) == 'Gay')
-                gaycount += 1
-            if (ftr.getFeature(idxVec[j]) == 'Abortion')
-                abortioncount += 1;
-        }
     }
-}
-
+    
+    for (var j = 0; j < idxVec.length; j++) { 
+        if (ftr.getFeature(idxVec[j]) == 'Gay')
+            gaycount += 1
+        if (ftr.getFeature(idxVec[j]) == 'Abortion')
+            abortioncount += 1;
+    }
+}// for allRecords
 
 console.log("tsStore filled");
+console.timeEnd("counts");
 
 
 
