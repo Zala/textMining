@@ -7,7 +7,8 @@ let newsSchema = {
     name: "news",
     fields: [
         { name: "text", type: "string" },
-        { name: "date", type: "datetime" }
+        { name: "date", type: "datetime" },
+        { name: "concepts", type: "string_v" }
     ]
 };
 'defined schema'
@@ -23,33 +24,50 @@ console.time("import");
 while (!fin.eof) {
     let line = fin.readLine();
     let fields = JSON.parse(line);
+    let concepts = [];
+    for (let i in fields.concepts){
+        concepts.push(fields.concepts[i].label.eng)
+    }
     let recJson = {
         text: fields.body,
-        date: fields.date + "T" + fields.time
+        date: fields.date + "T" + fields.time,
+        concepts: concepts
     };
     newsStore.push(recJson);
 }
 console.timeEnd("import");
 
-// create a feature space containing the text (bag of words) extractor, 
-// where the values are normalized,
-// weighted with 'tfidf' and the tokenizer is of 'simple' type, 
-// it uses english stopwords.
-var ftr = new qm.FeatureSpace(base, 
-    { type: "text", source: "news", field: "text", normalize: true, 
-        weight: "tfidf", tokenizer: { type: "simple", stopwords: "en"}
-    }    
-);
+// create a feature space 
+console.time("feature_extr");
 
 let news = base.store('news').allRecords;
-ftr.updateRecords(news);
 
-let M = ftr.extractSparseMatrix(news);
+let ftr = new qm.FeatureSpace(base, 
+    { type: "multinomial", source: "news", field: "concepts", 
+        values: ["Gay", "Abortion"] }       
+);
+ftr.addFeatureExtractor(
+    { type: "multinomial", source: "news", field: "date", datetime: true }
+);
+
+ftr.updateRecords(news);
+console.timeEnd("feature_extr");
+
+
+//let M = ftr.extractSparseMatrix(news);
 //first
-let first = M.getCol(0);
-first.print();
-ftr.getFeature(0);
-first.at(0); //value at 0 ind
+//let first = M.getCol(0);
+//first.print();
+//ftr.getFeature(0);
+//first.at(0); //value at 0 ind
+
+var rec = newsStore[1];
+var vec = ftr.extractSparseVector(rec);
+var idxVec = vec.idxVec();
+var valVec = vec.valVec();
+for (var i = 0; i < idxVec.length; i++) {
+    console.log(ftr.getFeature(idxVec[i]) + " " + valVec[i]);
+}
 
 
 debugger
