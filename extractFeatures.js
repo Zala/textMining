@@ -44,7 +44,7 @@ let news = base.store('news').allRecords;
 
 let ftr = new qm.FeatureSpace(base, 
     { type: "multinomial", source: "news", field: "concepts", 
-        values: ["Gay", "Abortion"] }       // add new concepts if needed
+        values: ["Gay", "Abortion", "Illegal immigration", "Climate change", "Wall Street"] }       // Illegal immigration as proxy for Trump's Wall, add new concepts if needed
 );
 // ftr.addFeatureExtractor(
 //     { type: "multinomial", source: "news", field: "date",datetime: true }
@@ -60,7 +60,11 @@ let tsSchema = {
     fields: [
         { name: "Time", type: "datetime" },
         { name: "gayCount", type: "float" },
-        { name: "abortionCount", type: "float" } //add new concepts
+        { name: "abortionCount", type: "float" },
+        { name: "wallCount", type: "float" }, 
+        { name: "climateChgCount", type: "float" }, 
+        { name: "wallStCount", type: "float" } 
+         //add new concepts
     ]
 }
 
@@ -73,6 +77,9 @@ console.log("tsStore created");
 console.time("counts");
 var gaycount = 0;
 var abortioncount = 0;
+var wallcount = 0;
+var climatechgcount =0;
+var wallstcount =0;
 for (var i = 0; i < newsStore.length; i++) {
     var rec = newsStore[i];
     let recPrev = newsStore[0];
@@ -94,11 +101,17 @@ for (var i = 0; i < newsStore.length; i++) {
         tsStore.push({
             Time: weblogdate, 
             gayCount: gaycount,
-            abortionCount: abortioncount
+            abortionCount: abortioncount,
+            wallCount: wallcount,
+            climateChgCount: climatechgcount,
+            wallStCount: wallstcount
         });
         // reset the counts
         gaycount = 0;
         abortioncount = 0;
+        wallcount = 0;
+        climatechgcount =0;
+        wallstcount =0;
 
         //  report the results
         let newRec = tsStore.last;
@@ -108,7 +121,13 @@ for (var i = 0; i < newsStore.length; i++) {
             "Gay:",
             newRec.gayCount,
             "Abortion: ",
-            newRec.abortionCount
+            newRec.abortionCount,
+            "Wall: ",
+            newRec.wallCount,
+            "Climate_Change: ",
+            newRec.climateChgCount,
+            "Wall_St.: ",
+            newRec.wallStCount
         );
     }
     
@@ -117,6 +136,12 @@ for (var i = 0; i < newsStore.length; i++) {
             gaycount += 1
         if (ftr.getFeature(idxVec[j]) == 'Abortion')
             abortioncount += 1;
+        if (ftr.getFeature(idxVec[j]) == 'Illegal immigration') // proxy for Trump's Wall
+            wallcount += 1;
+        if (ftr.getFeature(idxVec[j]) == 'Climate change')
+            climatechgcount += 1;
+        if (ftr.getFeature(idxVec[j]) == 'Wall Street')
+            wallstcount += 1;    
     }
 }// for allRecords
 
