@@ -9,16 +9,25 @@ let base = new qm.Base({
 let tsStore = base.store("ts");
 
 
-fs.writeFile('tsStoreData.json', "[" + "\n", (err)=>{if (err) throw err;});
+fs.writeFile('tsStoreData.json', "", (err)=>{if (err) throw err;});
 console.log("writing to tsStoreData.json....")
 
 for (var i=0; i < tsStore.length; i++){
-    let recJson = JSON.stringify(tsStore[i].toJSON());
-    fs.appendFile('tsStoreData.json', recJson + ",\n");
+    let recJson = tsStore[i].toJSON();
+    recJson = { //leave out record id
+        Time: recJson.Time,
+        gayCount: recJson.gayCount,
+        abortionCount: recJson.abortionCount,
+        wallCount: recJson.wallCount,
+        climateChgCount: recJson.climateChgCount,
+        wallStCount: recJson.wallStCount,
+        privacyCount: recJson.privacyCount,
+        mexicoCount: recJson.mexicoCount
+    }
+    let recString = JSON.stringify(recJson); 
+    fs.appendFile('tsStoreData.json', recString + "\n");
     debugger
 }
-
-fs.appendFile('tsStoreData.json', "]");
 
 console.log("Finished!")
 
