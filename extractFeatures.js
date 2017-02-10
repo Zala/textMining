@@ -1,6 +1,7 @@
 
 let config = require("./config.json");
 let qm = require(config.qminer);
+let fs = require('fs');
 
 // create schema
 let newsSchema = {
@@ -85,6 +86,10 @@ var climatechgcount =0;
 var wallstcount =0;
 var privacycount =0;
 var mexicocount =0;
+
+ // Create output file and first line
+ fs.writeFile('tsData.csv', ["Date","Gay","Abortion","Wall","Climate Change", "Wall St.", "Privacy", "Mexico"]+"\n", (err)=> {if (err) throw err;});
+
 for (var i = 0; i < newsStore.length; i++) {
     var rec = newsStore[i];
     let recPrev = newsStore[0];
@@ -142,6 +147,12 @@ for (var i = 0; i < newsStore.length; i++) {
             "Mexico: ",
             newRec.mexicoCount
         );
+       
+        // Save output to CSV file
+        fs.appendFile('tsData.csv', [newRec.Time.toISOString(),newRec.gayCount,newRec.abortionCount, newRec.wallCount, newRec.climateChgCount,newRec.wallStCount, newRec.privacyCount, newRec.mexicoCount]+"\n", (err) => {
+                if (err) throw err;
+                //console.log('It\'s saved!');
+            });
     }
     
     for (var j = 0; j < idxVec.length; j++) { 
