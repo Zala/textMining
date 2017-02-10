@@ -17,7 +17,7 @@ let base = new qm.Base({ mode: "createClean" });
 let newsStore = base.createStore(newsSchema);
 
 // import news
-let fn = config.pathToData + "Trump.json";
+let fn = config.pathToData + "TrumpAll.json";
 let fin = qm.fs.openRead(fn);
 
 console.time("import");
@@ -44,7 +44,8 @@ let news = base.store('news').allRecords;
 
 let ftr = new qm.FeatureSpace(base, 
     { type: "multinomial", source: "news", field: "concepts", 
-        values: ["Gay", "Abortion", "Illegal immigration", "Climate change", "Wall Street"] }       // Illegal immigration as proxy for Trump's Wall, add new concepts if needed
+        values: ["Gay", "Abortion", "Illegal immigration", "Climate change", "Wall Street",
+        "Privacy", "Mexico" ] }       // Illegal immigration as proxy for Trump's Wall, add new concepts if needed
 );
 // ftr.addFeatureExtractor(
 //     { type: "multinomial", source: "news", field: "date",datetime: true }
@@ -63,7 +64,9 @@ let tsSchema = {
         { name: "abortionCount", type: "float" },
         { name: "wallCount", type: "float" }, 
         { name: "climateChgCount", type: "float" }, 
-        { name: "wallStCount", type: "float" } 
+        { name: "wallStCount", type: "float" }, 
+        { name: "privacyCount", type: "float" },
+        { name: "mexicoCount", type: "float" } 
          //add new concepts
     ]
 }
@@ -80,6 +83,8 @@ var abortioncount = 0;
 var wallcount = 0;
 var climatechgcount =0;
 var wallstcount =0;
+var privacycount =0;
+var mexicocount =0;
 for (var i = 0; i < newsStore.length; i++) {
     var rec = newsStore[i];
     let recPrev = newsStore[0];
@@ -104,7 +109,9 @@ for (var i = 0; i < newsStore.length; i++) {
             abortionCount: abortioncount,
             wallCount: wallcount,
             climateChgCount: climatechgcount,
-            wallStCount: wallstcount
+            wallStCount: wallstcount,
+            privacyCount: privacycount,
+            mexicoCount: mexicocount 
         });
         // reset the counts
         gaycount = 0;
@@ -112,6 +119,8 @@ for (var i = 0; i < newsStore.length; i++) {
         wallcount = 0;
         climatechgcount =0;
         wallstcount =0;
+        privacycount =0;
+        mexicocount =0;
 
         //  report the results
         let newRec = tsStore.last;
@@ -127,7 +136,11 @@ for (var i = 0; i < newsStore.length; i++) {
             "Climate_Change: ",
             newRec.climateChgCount,
             "Wall_St.: ",
-            newRec.wallStCount
+            newRec.wallStCount,
+            "Privacy: ",
+            newRec.privacyCount,
+            "Mexico: ",
+            newRec.mexicoCount
         );
     }
     
@@ -142,13 +155,17 @@ for (var i = 0; i < newsStore.length; i++) {
             climatechgcount += 1;
         if (ftr.getFeature(idxVec[j]) == 'Wall Street')
             wallstcount += 1;    
+        if (ftr.getFeature(idxVec[j]) == 'Privacy')
+            privacycount += 1;
+        if (ftr.getFeature(idxVec[j]) == 'Mexico')
+            mexicocount += 1;
     }
 }// for allRecords
 
 console.log("tsStore filled");
 console.timeEnd("counts");
 
-
+base.close();
 
 //let M = ftr.extractSparseMatrix(news);
 //first
