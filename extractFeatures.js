@@ -18,7 +18,7 @@ let base = new qm.Base({ mode: "createClean" });
 let newsStore = base.createStore(newsSchema);
 
 // import news
-let fn = config.pathToData + "TrumpAll.json";
+let fn = config.pathToData + config.fileName;
 let fin = qm.fs.openRead(fn);
 
 console.time("import");
@@ -45,8 +45,9 @@ let news = base.store('news').allRecords;
 
 let ftr = new qm.FeatureSpace(base, 
     { type: "multinomial", source: "news", field: "concepts", 
-        values: ["Gay", "Abortion", "Illegal immigration", "Climate change", "Wall Street",
-        "Privacy", "Mexico" ] }       // Illegal immigration as proxy for Trump's Wall, add new concepts if needed
+        values: ["Gay", "Abortion", "Illegal immigration", "Climate change", 
+        "Wall Street", "Privacy", "Mexico" ] }       
+        // Illegal immigration as proxy for Trump's Wall, add new concepts if needed
 );
 // ftr.addFeatureExtractor(
 //     { type: "multinomial", source: "news", field: "date",datetime: true }
@@ -88,7 +89,8 @@ var privacycount =0;
 var mexicocount =0;
 
  // Create output file and first line
- fs.writeFile('tsData.csv', ["Date","Gay","Abortion","Wall","Climate Change", "Wall St.", "Privacy", "Mexico"]+"\n", (err)=> {if (err) throw err;});
+ fs.writeFile('tsData.csv', ["Date","Gay","Abortion","Wall","Climate Change", 
+ "Wall St.", "Privacy", "Mexico"]+"\n", (err)=> {if (err) throw err;});
 
 for (var i = 0; i < newsStore.length; i++) {
     var rec = newsStore[i];
@@ -103,9 +105,9 @@ for (var i = 0; i < newsStore.length; i++) {
   
     // increase counts
     let date = rec.date;
-    date = date.setHours(0,0,0);
+    date = date.getUTCDate();
     let prevDate = recPrev.date;
-    prevDate = prevDate.setHours(0,0,0);
+    prevDate = prevDate.getUTCDate();
     if (date != prevDate) { // date changed so we push the value into tsStore
         let weblogdate = recPrev.date.toISOString().replace(/\..+/, '');
         tsStore.push({
