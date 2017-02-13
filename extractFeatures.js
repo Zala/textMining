@@ -105,10 +105,11 @@ for (var i = 0; i < newsStore.length; i++) {
   
     // increase counts
     let date = rec.date;
-    date = date.getUTCDate();
     let prevDate = recPrev.date;
-    prevDate = prevDate.getUTCDate();
-    if (date != prevDate) { // date changed so we push the value into tsStore
+    if (date.getUTCDate() > prevDate.getUTCDate() || 
+        (date.getUTCDate() < prevDate.getUTCDate() && 
+        date.getUTCMonth() > prevDate.getUTCMonth())) { // date changed so we push the value into tsStore
+        
         let weblogdate = recPrev.date.toISOString().replace(/\..+/, '');
         tsStore.push({
             Time: weblogdate, 
