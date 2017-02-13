@@ -3,11 +3,33 @@ let qm = require(config.qminer);
 var loader = require("mt-dataloader");
 var glm = require('regression');
 
-let base = new qm.Base({
-    mode: 'openReadOnly'
-})
+// let base = new qm.Base({
+//     mode: 'openReadOnly'
+// })
 
-let tsStore = base.store("ts");
+// let tsStore = base.store("ts");
+
+let base = new qm.Base({
+    mode: 'createClean',
+    schema: [
+        { name: 'ts',
+          fields: [
+               { name: "Time", type: "datetime" },
+               { name: "gayCount", type: "float" },
+               { name: "abortionCount", type: "float" },
+               { name: "wallCount", type: "float" }, 
+               { name: "climateChgCount", type: "float" }, 
+               { name: "wallStCount", type: "float" }, 
+               { name: "privacyCount", type: "float" },
+               { name: "mexicoCount", type: "float" } 
+          ]
+        }
+    ]
+});
+let tsStore = base.store('ts');
+
+loader.loadTrumpDataset(tsStore);
+tsStore.length;
 
 let stats = qm.statistics;
 
