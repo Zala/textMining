@@ -9,10 +9,10 @@ let base = new qm.Base({
 
 let tsStore = base.store("ts");
 
+let stats = qm.statistics;
 
 // ***************************** abortion *****************************
 let ts = tsStore.getVector('abortionCount').toArray();
-
 let t = [];
 for (let i=0; i<ts.length; i++){
     let tuple = [i, ts[i]];
@@ -21,12 +21,15 @@ for (let i=0; i<ts.length; i++){
 
 let result = glm('linear', t);
 let test = ttest(result.equation[0], 0, ts, getPredictions(result.points));
-debugger
+let p = stats.studentCdf(test, ts.length-2);
+console.log('degrees of freedom: ', ts.length-2);
+console.log('');
 // let slope = result.equation[0];
 // let yIntercept = result.equation[1];
 console.log('Linear regression for abortion: ', result.string);
 console.log('r2 for abortion: ', result.r2);
 console.log('tscore for abortion: ', test);
+console.log('p-value: ', p);
 console.log('');
 
 
@@ -39,10 +42,12 @@ for (let i=0; i<ts.length; i++){
 }
 result = glm('linear', t);
 test = ttest(result.equation[0], 0, ts, getPredictions(result.points));
+p = stats.studentCdf(test, ts.length-2);
 
 console.log('Linear regression for mexico: ', result.string);
 console.log('r2 for mexico: ', result.r2);
 console.log('tscore for mexico: ', test);
+console.log('p-value: ', p);
 console.log('');
 
 
@@ -56,10 +61,12 @@ for (let i=0; i<ts.length; i++){
 }
 result = glm('linear', t);
 test = ttest(result.equation[0], 0, ts, getPredictions(result.points));
+p = stats.studentCdf(test, ts.length-2);
 
 console.log('Linear regression for privacy: ', result.string);
 console.log('r2 for privacy: ', result.r2);
 console.log('tscore for privacy: ', test);
+console.log('p-value: ', p);
 console.log('');
 
 // ***************************** wall street *****************************
@@ -71,10 +78,12 @@ for (let i=0; i<ts.length; i++){
 }
 result = glm('linear', t);
 test = ttest(result.equation[0], 0, ts, getPredictions(result.points));
+p = stats.studentCdf(test, ts.length-2);
 
 console.log('Linear regression for wall street: ', result.string);
 console.log('r2 for wallStCount: ', result.r2);
 console.log('tscore for wallStCount: ', test);
+console.log('p-value: ', p);
 console.log('');
 
 // ***************************** climate change *****************************
@@ -86,10 +95,12 @@ for (let i=0; i<ts.length; i++){
 }
 result = glm('linear', t);
 test = ttest(result.equation[0], 0, ts, getPredictions(result.points));
+p = stats.studentCdf(test, ts.length-2);
 
 console.log('Linear regression for climate change: ', result.string);
 console.log('r2 for climateChg: ', result.r2);
 console.log('tscore for climate change: ', test);
+console.log('p-value: ', p);
 console.log('');
 
 // ***************************** wall *****************************
@@ -101,10 +112,12 @@ for (let i=0; i<ts.length; i++){
 }
 result = glm('linear', t);
 test = ttest(result.equation[0], 0, ts, getPredictions(result.points));
+p = stats.studentCdf(test, ts.length-2);
 
 console.log('Linear regression for wall: ', result.string);
 console.log('r2 for wall: ', result.r2);
 console.log('tscore for wall: ', test);
+console.log('p-value: ', p);
 console.log('');
 
 // ***************************** gay *****************************
@@ -116,10 +129,12 @@ for (let i=0; i<ts.length; i++){
 }
 result = glm('linear', t);
 test = ttest(result.equation[0], 0, ts, getPredictions(result.points));
+p = stats.studentCdf(test, ts.length-2);
 
 console.log('Linear regression for gay: ', result.string);
 console.log('r2 for gay: ', result.r2);
 console.log('tscore for gay: ', test);
+console.log('p-value: ', p);
 console.log('');
 
 
