@@ -94,35 +94,36 @@ var mexicocount =0;
 
 for (var i = 0; i < newsStore.length; i++) {
     var rec = newsStore[i];
-    //let recPrev = newsStore[0];
-    //recPrev.Time = recPrev.date;
-    let recPrev = {};
-    if (tsStore.length > 0)
-        recPrev = tsStore.last;
-    else if (i==0){
-         recPrev = newsStore[0];   
-         recPrev.Time = recPrev.date;     
-    }
-    else{
-         recPrev = newsStore[i-1];
-         recPrev.Time = recPrev.date;
+
+    if (tsStore.length > 0 && rec.date <= tsStore.last.Time){
+        continue;
     }
 
-       // recPrev = newsStore[i - 1];
+    let recPrev = newsStore[i-1];
+    if (i==0){
+         recPrev = newsStore[0];    
+    }
+
+    // let latest = recPrev.date;
+    // if (tsStore.length > 0){
+    //     latest = tsStore.last.Time;
+    // }
     
     var vec = ftr.extractSparseVector(rec);
     var valVec = vec.valVec();
     var idxVec = vec.idxVec();
    
-  
     // increase counts
     let date = rec.date;
-    let prevDate = recPrev.Time;
+    let prevDate = recPrev.date;
+
     if (date.getUTCDate() > prevDate.getUTCDate() || 
         (date.getUTCDate() < prevDate.getUTCDate() && 
         date.getUTCMonth() > prevDate.getUTCMonth())) { // date changed so we push the value into tsStore
         
-        let weblogdate = recPrev.Time.toISOString().replace(/\..+/, '');
+        debugger
+        let weblogdate = recPrev.date.toISOString().replace(/\..+/, '');
+        debugger
         tsStore.push({
             Time: weblogdate, 
             gayCount: gaycount,
