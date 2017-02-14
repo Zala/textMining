@@ -18,7 +18,7 @@ let base = new qm.Base({ mode: "createClean" });
 let newsStore = base.createStore(newsSchema);
 
 // import news
-let fn = config.pathToData + config.fileName;
+let fn = config.pathToData + config.fileName ; //  config.testData
 let fin = qm.fs.openRead(fn);
 
 console.time("import");
@@ -93,37 +93,48 @@ var mexicocount =0;
  "Wall St.", "Privacy", "Mexico"]+"\n", (err)=> {if (err) throw err;});
 
 for (var i = 0; i < newsStore.length; i++) {
+    
     var rec = newsStore[i];
-
-    if (tsStore.length > 0 && rec.date <= tsStore.last.Time){
+    if(tsStore.length > 0  && rec.date <= tsStore.last.Time){
         continue;
     }
-
-    let recPrev = newsStore[i-1];
-    if (i==0){
-         recPrev = newsStore[0];    
-    }
-
-    // let latest = recPrev.date;
-    // if (tsStore.length > 0){
-    //     latest = tsStore.last.Time;
+    
+    let recPrev = newsStore[0];
+    if (i > 0)
+        recPrev = newsStore[i - 1];
+    //recPrev.Time = recPrev.date;
+    // let recPrev = {};
+    // if (tsStore.length > 0)
+    //     recPrev = tsStore.last;
+    // else if (i==0){
+    //      recPrev = newsStore[0];   
+    //      recPrev.Time = recPrev.date;     
     // }
+    // else{
+    //      recPrev = newsStore[i-1];
+    //      recPrev.Time = recPrev.date;
+    // }
+
+       // recPrev = newsStore[i - 1];
     
     var vec = ftr.extractSparseVector(rec);
     var valVec = vec.valVec();
     var idxVec = vec.idxVec();
    
+  
     // increase counts
     let date = rec.date;
+   // date = date.getUTCDate();
     let prevDate = recPrev.date;
+   // prevDate = prevDate.getUTCDate();
+   // console.log("date: " ,date, "prev date: ", prevDate);
 
     if (date.getUTCDate() > prevDate.getUTCDate() || 
         (date.getUTCDate() < prevDate.getUTCDate() && 
-        date.getUTCMonth() > prevDate.getUTCMonth())) { // date changed so we push the value into tsStore
+        date.getUTCMonth() > prevDate.getUTCMonth())
+        ) { // date changed so we push the value into tsStore
         
-        debugger
         let weblogdate = recPrev.date.toISOString().replace(/\..+/, '');
-        debugger
         tsStore.push({
             Time: weblogdate, 
             gayCount: gaycount,
