@@ -3,41 +3,51 @@ let qm = require(config.qminer);
 var loader = require("mt-dataloader");
 var glm = require('regression');
 
-// let base = new qm.Base({
-//     mode: 'openReadOnly'
-// })
-
-// let tsStore = base.store("ts");
-
 let base = new qm.Base({
-    mode: 'createClean',
-    schema: [
-        { name: 'ts',
-          fields: [
-               { name: "Time", type: "datetime" },
-               { name: "gayCount", type: "float" },
-               { name: "abortionCount", type: "float" },
-               { name: "wallCount", type: "float" }, 
-               { name: "climateChgCount", type: "float" }, 
-               { name: "wallStCount", type: "float" }, 
-               { name: "privacyCount", type: "float" },
-               { name: "mexicoCount", type: "float" } 
-          ]
-        }
-    ]
-});
-let tsStore = base.store('ts');
+    mode: 'openReadOnly'
+})
 
-loader.loadTrumpDataset(tsStore);
-tsStore.length;
+let tsStore = base.store("ts");
+
+// let base = new qm.Base({
+//     mode: 'createClean',
+//     schema: [
+//         { name: 'ts',
+//           fields: [
+//                { name: "Time", type: "datetime" },
+//                { name: "gayCount", type: "float" },
+//                { name: "abortionCount", type: "float" },
+//                { name: "wallCount", type: "float" }, 
+//                { name: "climateChgCount", type: "float" }, 
+//                { name: "wallStCount", type: "float" }, 
+//                { name: "privacyCount", type: "float" },
+//                { name: "mexicoCount", type: "float" },
+//                { name: "dailyCount", type: "float" }  
+//           ]
+//         }
+//     ]
+// });
+// let tsStore = base.store('ts');
+
+// loader.loadTrumpDataset(tsStore);
+//tsStore.length;
 
 let stats = qm.statistics;
+
+let daily = tsStore.getVector('dailyCount').toArray();
+console.log("daily filled with:", daily.length);
+console.log(daily[1]);
 
 // ***************************** abortion *****************************
 let ts = tsStore.getVector('abortionCount').toArray();
 let t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [0,0]
+    if(daily[i]==0){
+         tuple = [i, 0];
+    } else{
+         tuple = [i, ts[i]/daily[i]];
+    }
     t.push(tuple);
 }
 
@@ -54,12 +64,12 @@ console.log('tscore for abortion: ', test);
 console.log('p-value: ', p);
 console.log('');
 
-
+debugger
 // ***************************** mexico *****************************
 ts = tsStore.getVector('mexicoCount').toArray();
 t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [i, ts[i]/daily[i]];
     t.push(tuple);
 }
 result = glm('linear', t);
@@ -78,7 +88,7 @@ console.log('');
 ts = tsStore.getVector('privacyCount').toArray();
 t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [i, ts[i]/daily[i]];
     t.push(tuple);
 }
 result = glm('linear', t);
@@ -95,7 +105,7 @@ console.log('');
 ts = tsStore.getVector('wallStCount').toArray();
 t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [i, ts[i]/daily[i]];
     t.push(tuple);
 }
 result = glm('linear', t);
@@ -112,7 +122,7 @@ console.log('');
 ts = tsStore.getVector('climateChgCount').toArray();
 t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [i, ts[i]/daily[i]];
     t.push(tuple);
 }
 result = glm('linear', t);
@@ -129,7 +139,7 @@ console.log('');
 ts = tsStore.getVector('wallCount').toArray();
 t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [i, ts[i]/daily[i]];
     t.push(tuple);
 }
 result = glm('linear', t);
@@ -146,7 +156,7 @@ console.log('');
 ts = tsStore.getVector('gayCount').toArray();
 t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [i, ts[i]]/daily[i];
     t.push(tuple);
 }
 result = glm('linear', t);
