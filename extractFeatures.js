@@ -68,7 +68,8 @@ let tsSchema = {
         { name: "climateChgCount", type: "float" }, 
         { name: "wallStCount", type: "float" }, 
         { name: "privacyCount", type: "float" },
-        { name: "mexicoCount", type: "float" } 
+        { name: "mexicoCount", type: "float" },
+        { name: "dailyCount", type: "float" } 
          //add new concepts
     ]
 }
@@ -87,6 +88,7 @@ var climatechgcount =0;
 var wallstcount =0;
 var privacycount =0;
 var mexicocount =0;
+var dailycount = 0;
 
  // Create output file and first line
  fs.writeFile('tsData.csv', ["Date","Gay","Abortion","Wall","Climate Change", 
@@ -143,16 +145,18 @@ for (var i = 0; i < newsStore.length; i++) {
             climateChgCount: climatechgcount,
             wallStCount: wallstcount,
             privacyCount: privacycount,
-            mexicoCount: mexicocount 
+            mexicoCount: mexicocount,
+            dailyCount: dailycount
         });
         // reset the counts
         gaycount = 0;
         abortioncount = 0;
         wallcount = 0;
-        climatechgcount =0;
-        wallstcount =0;
-        privacycount =0;
-        mexicocount =0;
+        climatechgcount = 0;
+        wallstcount = 0;
+        privacycount = 0;
+        mexicocount = 0;
+        dailycount = 0;
 
         //  report the results
         let newRec = tsStore.last;
@@ -172,17 +176,20 @@ for (var i = 0; i < newsStore.length; i++) {
             "Privacy: ",
             newRec.privacyCount,
             "Mexico: ",
-            newRec.mexicoCount
+            newRec.mexicoCount,
+            "Daily: ",
+            newRec.dailyCount
         );
        
         // Save output to CSV file
-        fs.appendFile('tsData.csv', [newRec.Time.toISOString(),newRec.gayCount,newRec.abortionCount, newRec.wallCount, newRec.climateChgCount,newRec.wallStCount, newRec.privacyCount, newRec.mexicoCount]+"\n", (err) => {
+        fs.appendFile('tsData.csv', [newRec.Time.toISOString(),newRec.gayCount,newRec.abortionCount, newRec.wallCount, newRec.climateChgCount,newRec.wallStCount, newRec.privacyCount, newRec.mexicoCount, newRec.dailyCount]+"\n", (err) => {
                 if (err) throw err;
                 //console.log('It\'s saved!');
             });
     }
     
     for (var j = 0; j < idxVec.length; j++) { 
+        dailyCount += 1;
         if (ftr.getFeature(idxVec[j]) == 'Gay')
             gaycount += 1
         if (ftr.getFeature(idxVec[j]) == 'Abortion')

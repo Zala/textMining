@@ -21,7 +21,8 @@ let base = new qm.Base({
                { name: "climateChgCount", type: "float" }, 
                { name: "wallStCount", type: "float" }, 
                { name: "privacyCount", type: "float" },
-               { name: "mexicoCount", type: "float" } 
+               { name: "mexicoCount", type: "float" },
+               { name: "dailyCount", type: "float" }  
           ]
         }
     ]
@@ -33,11 +34,13 @@ tsStore.length;
 
 let stats = qm.statistics;
 
+let daily = tsStore.getVector('dailyCount').toArray();
+
 // ***************************** abortion *****************************
 let ts = tsStore.getVector('abortionCount').toArray();
 let t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [i, ts[i]/daily[i]];
     t.push(tuple);
 }
 
@@ -59,7 +62,7 @@ console.log('');
 ts = tsStore.getVector('mexicoCount').toArray();
 t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [i, ts[i]/daily[i]];
     t.push(tuple);
 }
 result = glm('linear', t);
@@ -78,7 +81,7 @@ console.log('');
 ts = tsStore.getVector('privacyCount').toArray();
 t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [i, ts[i]/daily[i]];
     t.push(tuple);
 }
 result = glm('linear', t);
@@ -95,7 +98,7 @@ console.log('');
 ts = tsStore.getVector('wallStCount').toArray();
 t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [i, ts[i]/daily[i]];
     t.push(tuple);
 }
 result = glm('linear', t);
@@ -112,7 +115,7 @@ console.log('');
 ts = tsStore.getVector('climateChgCount').toArray();
 t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [i, ts[i]/daily[i]];
     t.push(tuple);
 }
 result = glm('linear', t);
@@ -129,7 +132,7 @@ console.log('');
 ts = tsStore.getVector('wallCount').toArray();
 t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [i, ts[i]/daily[i]];
     t.push(tuple);
 }
 result = glm('linear', t);
@@ -146,7 +149,7 @@ console.log('');
 ts = tsStore.getVector('gayCount').toArray();
 t = [];
 for (let i=0; i<ts.length; i++){
-    let tuple = [i, ts[i]];
+    let tuple = [i, ts[i]]/daily[i];
     t.push(tuple);
 }
 result = glm('linear', t);
